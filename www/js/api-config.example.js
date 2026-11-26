@@ -1,0 +1,3 @@
+window.SPACELIFESPAN_CONFIG = {
+  NASA_API_KEY: 'DEMO_KEY',
+};

@@ -1,0 +1,41 @@
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+www/js/api-config.js
+
+# Logs and operating system files
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editors and local tooling
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Android Studio and Gradle outputs
+.gradle/
+**/.gradle/
+local.properties
+**/local.properties
+**/build/
+*.apk
+*.aab
+*.ap_
+*.aar
+*.jks
+*.keystore
+
+# Capacitor-generated Android web assets
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/capacitor-cordova-android-plugins/

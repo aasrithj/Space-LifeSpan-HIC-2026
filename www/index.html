@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071a33" />
+    <meta
+      name="description"
+      content="SpaceLifeSpan satellite health and mission impact decision support prototype"
+    />
+    <title>SpaceLifeSpan — Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="icon" type="image/svg+xml" href="../images/logo.svg" sizes="any" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#home" aria-label="SpaceLifeSpan home"
+          ><span class="brand-mark">◉</span
+          ><span
+            >space<span class="brand-light">lifespan</span><small>MISSION INTELLIGENCE</small></span
+          ></a
+        >
+        <div class="workspace-label">WORKSPACE <span class="live-dot"></span></div>
+        <nav class="nav" aria-label="Main navigation">
+          <button class="nav-link active" data-view="home"><span>⌂</span> Overview</button>
+          <button class="nav-link" data-view="explorer"><span>⌕</span> Satellite explorer</button>
+          <button class="nav-link" data-view="life"><span>◎</span> My life</button>
+          <button class="nav-link" data-view="simulator"><span>⌁</span> Decision simulator</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="avatar">AJ</div>
+          <div><b>Aasrith Jangala</b><small>Flight operations</small></div>
+          </button>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumb">SPACEFLIGHT <span>/</span> <b id="crumb">OVERVIEW</b></div>
+          <div class="top-actions">
+            <span class="data-status"><i></i><span id="data-status">Connecting to data</span></span
+            ><button
+              class="icon-btn"
+              id="notifications-btn"
+              aria-label="Notifications"
+              title="Notifications"
+            >
+              ♧<em></em>
+            </button>
+            <div class="top-avatar" title="Aasrith Jangala">AJ</div>
+          </div>
+        </header>
+        <section class="view active" id="view-home">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">
+                <span id="current-date">MISSION CONTROL</span>
+                <span class="eyebrow-line"></span> SHIFT 01
+              </div>
+              <h1>Good morning, Aasrith Jangala <span class="wave">✳</span></h1>
+              <p>A clearer picture of the satellites that keep life moving.</p>
+            </div>
+            <button class="button secondary" id="refresh-btn">↻ <span>Refresh data</span></button>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>TRACKED OBJECTS</span><span class="metric-icon blue">⌁</span>
+              </div>
+              <div class="metric-value" id="tracked-count">—</div>
+              <div class="metric-foot">
+                <span class="status-pill green">● LIVE CATALOG</span><span>Selected group</span>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>SPACE WEATHER</span><span class="metric-icon amber">☼</span>
+              </div>
+              <div class="metric-value" id="weather-level">—</div>
+              <div class="metric-foot">
+                <span class="status-pill green" id="weather-pill">● CHECKING</span
+                ><span>DONKI · recent events</span>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>EARTH EVENTS</span><span class="metric-icon mint">⌖</span>
+              </div>
+              <div class="metric-value" id="event-count">—</div>
+              <div class="metric-foot">
+                <span class="status-pill blue-pill">EONET</span><span>Active natural events</span>
+              </div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top">
+                <span>MISSION CONTINUITY</span><span class="metric-icon violet">↗</span>
+              </div>
+              <div class="metric-value">+2.4<span class="unit"> yrs</span></div>
+              <div class="metric-foot">
+                <span class="status-pill violet-pill">MODEL ESTIMATE</span
+                ><span>Across 3 scenarios</span>
+              </div>
+            </article>
+          </div>
+          <div class="content-grid home-grid">
+            <article class="panel map-panel">
+              <div class="panel-heading">
+                <div>
+                  <div class="eyebrow">LIVE SITUATIONAL VIEW</div>
+                  <h2>Earth & orbital activity</h2>
+                </div>
+                <div class="map-legend">
+                  <span><i class="legend-dot satellite-dot"></i>Satellites</span
+                  ><span><i class="legend-dot event-dot"></i>Earth events</span>
+                </div>
+              </div>
+              <div id="home-map" class="map"></div>
+              <div class="panel-foot">
+                <span><span class="live-dot"></span> Ground track visualization</span
+                ><span>OpenStreetMap · Illustrative tracks</span>
+              </div>
+            </article>
+            <article class="panel watch-panel">
+              <div class="panel-heading">
+                <div>
+                  <div class="eyebrow">FLIGHT WATCH</div>
+                  <h2>Needs attention</h2>
+                </div>
+                <button class="text-button" data-goto="explorer">View fleet →</button>
+              </div>
+              <div id="watch-list" class="watch-list">
+                <div class="loading-row">Loading fleet data…</div>
+              </div>
+              <div class="notice">
+                <span>ⓘ</span>
+                <p>
+                  Health indicators are prototype estimates based on public orbital data and
+                  user-set assumptions.
+                </p>
+              </div>
+            </article>
+          </div>
+          <div class="section-title">
+            <div>
+              <div class="eyebrow">YOUR MISSION NETWORK</div>
+              <h2>Satellites in your life</h2>
+            </div>
+            <button class="text-button" data-goto="life">Explore local impact →</button>
+          </div>
+          <div class="mission-grid">
+            <article class="mission-card">
+              <div class="mission-symbol weather-symbol">☀</div>
+              <div><small>WEATHER</small><b>NOAA-18</b><span>Forecasts & storm tracking</span></div>
+              <i>↗</i>
+            </article>
+            <article class="mission-card">
+              <div class="mission-symbol nav-symbol">⌖</div>
+              <div>
+                <small>NAVIGATION</small><b>GPS IIR-20</b><span>Position & timing services</span>
+              </div>
+              <i>↗</i>
+            </article>
+            <article class="mission-card">
+              <div class="mission-symbol comm-symbol">⌁</div>
+              <div>
+                <small>EARTH OBSERVATION</small><b>Landsat 9</b
+                ><span>Land, water & ecosystem data</span>
+              </div>
+              <i>↗</i>
+            </article>
+          </div>
+        </section>
+        <section class="view" id="view-explorer">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">FLEET INTELLIGENCE</div>
+              <h1>Satellite explorer</h1>
+              <p>Explore public orbital elements and mission profiles.</p>
+            </div>
+            <span class="status-pill green">● CATALOG SYNC</span>
+          </div>
+          <div class="explorer-toolbar">
+            <label class="search-box"
+              >⌕ <input id="sat-search" type="search" placeholder="Search name or NORAD ID…"
+            /></label>
+            <div class="filters" id="filters">
+              <button class="filter active" data-filter="All">
+                All <span id="all-count">8</span></button
+              ><button class="filter" data-filter="Weather">Weather</button
+              ><button class="filter" data-filter="Navigation">Navigation</button
+              ><button class="filter" data-filter="Earth observation">Earth observation</button>
+            </div>
+          </div>
+          <div class="explorer-layout">
+            <div class="panel fleet-panel">
+              <div class="panel-heading">
+                <div>
+                  <div class="eyebrow">CATALOG RESULTS</div>
+                  <h2><span id="result-count">8</span> satellites</h2>
+                </div>
+                <span class="muted">UPDATED <span id="updated-time">—</span></span>
+              </div>
+              <div class="sat-list" id="sat-list"></div>
+            </div>
+            <div class="panel detail-panel" id="sat-detail">
+              <div class="detail-placeholder">
+                <span>◉</span>
+                <h2>Select a satellite</h2>
+                <p>Choose an object to inspect its orbit and mission profile.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="view" id="view-life">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">MISSION IMPACT</div>
+              <h1>My life in orbit</h1>
+              <p>See how satellite missions connect to your selected region.</p>
+            </div>
+            <span class="status-pill blue-pill">PRIVACY FIRST · STORED ON DEVICE</span>
+          </div>
+          <div class="life-layout">
+            <article class="panel profile-panel">
+              <div class="panel-heading">
+                <div>
+                  <div class="eyebrow">YOUR REGION</div>
+                  <h2>Location & interests</h2>
+                </div>
+                <span class="metric-icon blue">◎</span>
+              </div>
+              <label class="field-label" for="region-input">Region or ZIP code</label>
+              <div class="field-row">
+                <input id="region-input" value="Seattle, WA" maxlength="60" /><button
+                  class="button primary"
+                  id="save-region"
+                >
+                  Save
+                </button>
+              </div>
+              <button class="text-button locate-btn" id="locate-btn">
+                ⌖ Use my device location
+              </button>
+              <p class="privacy-note">
+                Your location stays in this browser and is not sent to SpaceLifeSpan.
+              </p>
+              <div class="divider"></div>
+              <div class="eyebrow">WHAT MATTERS TO YOU</div>
+              <div class="interest-chips">
+                <button class="interest selected">Weather</button
+                ><button class="interest selected">Navigation</button
+                ><button class="interest">Communications</button
+                ><button class="interest selected">Environment</button>
+              </div>
+            </article>
+            <article class="panel impact-panel">
+              <div class="panel-heading">
+                <div>
+                  <div class="eyebrow">CONNECTED MISSIONS</div>
+                  <h2>Services around <span id="region-label">Seattle, WA</span></h2>
+                </div>
+                <span class="status-pill green">4 MISSION TYPES</span>
+              </div>
+              <div class="impact-list">
+                <div class="impact-row">
+                  <div class="impact-icon weather-symbol">☀</div>
+                  <div>
+                    <b>Weather forecasting</b
+                    ><span>Polar orbiters observe cloud systems and severe weather.</span>
+                  </div>
+                  <div class="impact-sats">NOAA · JPSS <i>● ACTIVE</i></div>
+                </div>
+                <div class="impact-row">
+                  <div class="impact-icon nav-symbol">⌖</div>
+                  <div>
+                    <b>Navigation & timing</b
+                    ><span>GNSS constellations support positioning across daily services.</span>
+                  </div>
+                  <div class="impact-sats">GPS · GALILEO <i>● ACTIVE</i></div>
+                </div>
+                <div class="impact-row">
+                  <div class="impact-icon comm-symbol">⌁</div>
+                  <div>
+                    <b>Communications</b
+                    ><span>Satellite links extend connectivity across remote areas.</span>
+                  </div>
+                  <div class="impact-sats">GEO FLEET <i>● ACTIVE</i></div>
+                </div>
+                <div class="impact-row">
+                  <div class="impact-icon earth-symbol">◈</div>
+                  <div>
+                    <b>Earth observation</b
+                    ><span>Imagery supports land, water and environmental monitoring.</span>
+                  </div>
+                  <div class="impact-sats">LANDSAT · SENTINEL <i>● ACTIVE</i></div>
+                </div>
+              </div>
+              <div class="notice">
+                <span>ⓘ</span>
+                <p>
+                  Coverage depends on orbit, line of sight, equipment and service availability. This
+                  view explains mission types; it does not verify live coverage at your exact
+                  address.
+                </p>
+              </div>
+            </article>
+          </div>
+          <article class="panel life-map-panel">
+            <div class="panel-heading">
+              <div>
+                <div class="eyebrow">GLOBAL CONTEXT</div>
+                <h2>Orbit connects regions</h2>
+              </div>
+            </div>
+            <div id="life-map" class="map life-map"></div>
+          </article>
+        </section>
+        <section class="view" id="view-simulator">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">ENGINEERING + ECONOMICS</div>
+              <h1>Second life simulator</h1>
+              <p>Compare operating, servicing and replacement scenarios.</p>
+            </div>
+            <span class="status-pill amber-pill"
+              >SCENARIO MODEL · NOT A FLIGHT CERTIFICATION TOOL</span
+            >
+          </div>
+          <div class="sim-layout">
+            <article class="panel sim-inputs">
+              <div class="panel-heading">
+                <div>
+                  <div class="eyebrow">SCENARIO INPUTS</div>
+                  <h2>Mission assumptions</h2>
+                </div>
+                <span class="metric-icon violet">⌁</span>
+              </div>
+              <label class="field-label" for="sim-satellite">Satellite profile</label
+              ><select id="sim-satellite" class="select-field"></select>
+              <div class="range-group">
+                <label
+                  ><span>Current age</span><b><output id="age-output">9</output> years</b></label
+                ><input type="range" id="age" min="1" max="25" value="9" />
+              </div>
+              <div class="range-group">
+                <label
+                  ><span>Subsystem degradation / year</span
+                  ><b><output id="degradation-output">4.0</output>%</b></label
+                ><input type="range" id="degradation" min="1" max="12" step="0.5" value="4" />
+              </div>
+              <div class="range-group">
+                <label
+                  ><span>Fuel remaining</span><b><output id="fuel-output">62</output>%</b></label
+                ><input type="range" id="fuel" min="5" max="100" value="62" />
+              </div>
+              <div class="range-group">
+                <label
+                  ><span>Repair / servicing cost</span
+                  ><b>$<output id="repair-output">18</output>M</b></label
+                ><input type="range" id="repair" min="5" max="80" value="18" />
+              </div>
+              <div class="range-group">
+                <label
+                  ><span>Replacement launch cost</span
+                  ><b>$<output id="replace-output">80</output>M</b></label
+                ><input type="range" id="replace" min="20" max="250" value="80" />
+              </div>
+              <div class="range-group">
+                <label
+                  ><span>Solar exposure adjustment</span
+                  ><b><output id="solar-output">1.0</output>×</b></label
+                ><input type="range" id="solar" min="0.5" max="2" step="0.1" value="1" />
+              </div>
+              <button class="button primary run-button" id="run-sim">
+                ↻ Recalculate scenarios
+              </button>
+            </article>
+            <div class="sim-results">
+              <article class="panel recommendation-panel">
+                <div class="panel-heading">
+                  <div>
+                    <div class="eyebrow">RECOMMENDED PATH</div>
+                    <h2 id="recommendation">Keep operating</h2>
+                  </div>
+                  <div class="confidence">
+                    <span id="confidence">78</span><small>SCENARIO<br />ROBUSTNESS</small>
+                  </div>
+                </div>
+                <p id="recommendation-copy">
+                  Current assumptions favor continued operation with routine monitoring.
+                </p>
+                <div class="recommendation-tags">
+                  <span id="decision-tag" class="status-pill green">KEEP OPERATING</span
+                  ><span class="status-pill blue-pill">5-YEAR HORIZON</span>
+                </div>
+              </article>
+              <div class="result-cards">
+                <article class="panel result-card">
+                  <div class="eyebrow">5-YEAR FAILURE RISK</div>
+                  <div class="result-number" id="risk-value">28<span>%</span></div>
+                  <div class="sparkline" id="risk-chart"></div>
+                  <div class="result-caption">Cumulative estimated probability</div>
+                </article>
+                <article class="panel result-card">
+                  <div class="eyebrow">EXPECTED NPV</div>
+                  <div class="result-number" id="npv-value">+$24<span>M</span></div>
+                  <div class="npv-breakdown">
+                    <span>Operating value</span><b id="op-value">$64M</b><span>Action cost</span
+                    ><b id="cost-value">−$0M</b>
+                  </div>
+                </article>
+              </div>
+              <article class="panel compare-panel">
+                <div class="panel-heading">
+                  <div>
+                    <div class="eyebrow">TRADE-OFF ANALYSIS</div>
+                    <h2>Compare pathways</h2>
+                  </div>
+                  <span class="muted">RELATIVE 5-YEAR VALUE</span>
+                </div>
+                <div id="pathways"></div>
+              </article>
+              <article class="panel sustainability">
+                <div class="sustain-icon">♻</div>
+                <div>
+                  <div class="eyebrow">SUSTAINABILITY OUTLOOK</div>
+                  <h3 id="sustain-title">Lower near-term launch demand</h3>
+                  <p id="sustain-copy">
+                    Continuing service avoids a new launch in this scenario; end-of-life planning
+                    remains essential.
+                  </p>
+                </div>
+                <div class="sustain-score">
+                  <b id="sustain-score">72</b><small>IMPACT<br />SCORE</small>
+                </div>
+              </article>
+              <p class="model-note">
+                Illustrative decision support only. Failure probability and NPV are simplified
+                scenario estimates, not validated engineering predictions. Public GP/TLE data
+                describes orbit and does not reveal internal spacecraft health. Confirm assumptions
+                with mission-specific engineering and financial data.
+              </p>
+            </div>
+          </div>
+        </section>
+        <footer>
+          SPACELIFESPAN <span>LONGER LIFE FOR SATELLITES. A BRIGHTER FUTURE FOR YOU.</span
+          ><span>PROTOTYPE · PUBLIC DATA</span>
+        </footer>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </main>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/6.0.1/satellite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="js/api-config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/simulator.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
